@@ -101,15 +101,25 @@ export default function ContactForm() {
   };
   const handleSubmit = (e) => {
   e.preventDefault();
-  setIsSubmitting(true);
-  emailjs.sendForm(
-  import.meta.env.VITE_EMAILJS_SERVICE_ID,
-  import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-  form.current,
-  {
-    publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+
+  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+  // Guard: missing configuration is the most common cause of failed sends.
+  const missing = [
+    !serviceId && 'VITE_EMAILJS_SERVICE_ID',
+    !templateId && 'VITE_EMAILJS_TEMPLATE_ID',
+    !publicKey && 'VITE_EMAILJS_PUBLIC_KEY',
+  ].filter(Boolean);
+  if (missing.length) {
+    console.error('EmailJS config missing:', missing.join(', '));
+    alert(`Email is not configured. Missing: ${missing.join(', ')}. Add these to your .env file and restart the dev server.`);
+    return;
   }
-)
+
+  setIsSubmitting(true);
+  emailjs.sendForm(serviceId, templateId, form.current, { publicKey })
   .then(() => {
     setIsSubmitting(false);
     setIsSuccess(true);
@@ -127,7 +137,9 @@ export default function ContactForm() {
   .catch((error) => {
     console.error("EmailJS Error:", error);
     setIsSubmitting(false);
-    alert("Failed to send message. Please try again.");
+    const detail = error?.text || error?.message || 'Unknown error';
+    const status = error?.status ? ` (status ${error.status})` : '';
+    alert(`Failed to send message${status}: ${detail}`);
   });
 };
   return (
