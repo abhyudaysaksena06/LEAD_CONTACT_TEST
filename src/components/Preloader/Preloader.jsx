@@ -76,8 +76,16 @@ export default function Preloader({ onComplete }) {
     el.setAttribute('webkit-playsinline', '')
   }
 
+  // Start warming the site's media the moment the bar appears, rather than
+  // waiting for the clip to start playing. Tier 1 (Home) resolves this promise
+  // and releases the reveal; the heavier route/gallery tiers keep downloading
+  // in the background so those pages don't buffer when the user gets there.
+  useEffect(() => {
+    prefetchSiteAssets().then(() => { warmedRef.current = true })
+  }, [])
+
   // True-preloader gate, part 1: the page itself must have finished loading.
-  // (Part 2 — the asset warm-up — is chained off prefetchSiteAssets() below.)
+  // (Part 2 — the asset warm-up — is kicked off at mount, above.)
   useEffect(() => {
     if (document.readyState === 'complete') {
       pageLoadedRef.current = true
@@ -117,8 +125,8 @@ export default function Preloader({ onComplete }) {
     const enterPlaying = (v) => {
       phaseRef.current = 'playing'
       setPhase('playing')
-      // The clip is on screen now, so warm the rest of the site in the
-      // background (idempotent; safe if it was already kicked off).
+      // Warm-up already started at mount; this is a no-op safety net because
+      // prefetchSiteAssets() is idempotent.
       prefetchSiteAssets().then(() => { warmedRef.current = true })
       if (v) {
         // The clip has been autoplaying muted (hidden) since mount — that's what

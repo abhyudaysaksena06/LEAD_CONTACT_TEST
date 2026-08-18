@@ -2,6 +2,7 @@ import "./Home.css";
 import ParticleCube from "./Cube/ParticleCube";
 import About from "./About";
 import Domains from "../Domains/Domains";
+import Footer from "../../components/Footer/Footer";
 
 function Home({ isHome = true }) {
   return (
@@ -26,6 +27,8 @@ function Home({ isHome = true }) {
       <About />
 
       <Domains />
+
+      <Footer />
     </>
   );
 }

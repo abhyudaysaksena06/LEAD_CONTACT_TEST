@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
 import './Footer.css'
-import mascotBanner from '../../assets/mascot-nbg.png'
+import mascotBanner from '../../assets/mascot-nbg.webp'
 import leadLogo from '../../assets/LEAD.png'
 
 // Footer inspired by the Immersive Learning site: a scrolling accent ribbon,
@@ -57,25 +57,29 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="lead-footer__inner" style={{ padding: '1.5rem 1.5rem 2rem' }}>
-        {/* Big LEAD wordmark on the left */}
-        <img src={leadLogo} alt="LEAD" className="lead-footer__biglogo" style={{ width: '22rem', bottom: '12rem', left: '3rem' }} />
-        {/* Mascot emerging from the bottom-left corner — clicking it opens highlights */}
-        <NavLink
-          to="/events"
-          className="lead-footer__mascot-link"
-          aria-label="View LEAD Highlights"
-        >
-          <img
-            src={mascotBanner}
-            alt="LEAD mascot holding an 'Events Coming Soon' banner"
-            className="lead-footer__mascot"
-            style={{ width: '13rem' }}
-          />
-        </NavLink>
+      <div className="lead-footer__inner">
+        {/* Decorative pair. On phones/tablets this is a real flow row that sits
+            between the links and the copyright; on desktop the two images are
+            absolutely positioned against .lead-footer__inner instead. */}
+        <div className="lead-footer__art">
+          {/* Mascot — clicking it opens highlights */}
+          <NavLink
+            to="/events"
+            className="lead-footer__mascot-link"
+            aria-label="View LEAD Highlights"
+          >
+            <img
+              src={mascotBanner}
+              alt="LEAD mascot holding an 'Events Coming Soon' banner"
+              className="lead-footer__mascot"
+            />
+          </NavLink>
+          {/* Big LEAD wordmark */}
+          <img src={leadLogo} alt="LEAD" className="lead-footer__biglogo" />
+        </div>
 
-        <div className="lead-footer__body" style={{ gap: '1.5rem' }}>
-          <div className="lead-footer__grid" style={{ gap: '1.5rem' }}>
+        <div className="lead-footer__body">
+          <div className="lead-footer__grid">
           <div className="lead-footer__col">
             <p className="lead-footer__label">[Menu]</p>
             <ul className="lead-footer__links">
@@ -125,7 +129,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <p className="lead-footer__copy" style={{ margin: '1.5rem 0 0', paddingTop: '1rem' }}>
+        <p className="lead-footer__copy">
           <span className="lead-footer__copy-mark">©</span> LEAD 2026 — All rights reserved
           <span className="lead-footer__cursor">▊</span>
         </p>

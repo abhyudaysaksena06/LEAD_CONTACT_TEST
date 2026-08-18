@@ -1,11 +1,19 @@
 /**
- * Warms the site's assets in the background while the preloader video plays.
+ * Warms the site's media in the background, starting the moment the preloader
+ * bar appears.
  *
- * The route components are imported statically in App.jsx, so their JS is
- * already in the main bundle and the Home page mounts *behind* the preloader
- * overlay (its 3D canvas initialises during the intro). What is still missing
- * at reveal time are the images and webfonts, which normally only start
- * downloading once a section scrolls into view. This kicks them off up front.
+ * Strategy — staged tiers, warmed in order, so the page the user actually sees
+ * first is never starved by media belonging to a route they haven't opened:
+ *
+ *   Tier 1  HOME (critical)   nav logo, hero art, webfont      ← gates the reveal
+ *   Tier 2  HOME (below fold) footer mascot + wordmark
+ *   Tier 3  NEAR ROUTES       team portraits, sponsor logos
+ *   Tier 4  HEAVY MEDIA       /event-images (6), /gallery-photos (50)
+ *
+ * Only Tier 1 is awaited by the preloader. Tiers 2-4 continue downloading after
+ * the site is revealed, during idle time, so /gallery and /events are already
+ * cached by the time the user navigates there — which is what removes the
+ * buffering hitch on those pages.
  *
  * Everything here is fire-and-forget: failures are swallowed and nothing is
  * allowed to delay or block the preloader.
@@ -18,15 +26,47 @@ const bundledAssets = import.meta.glob(
   { eager: true, query: '?url', import: 'default' }
 )
 
-// Assets served straight from /public.
-const publicAssets = [
-  '/LEAD_white.png',
-  '/mascot.png',
-  '/favicon.svg',
-  '/icons.svg',
-]
+// Bundled URLs are hashed, so select them by their source path, not filename.
+function bundled(match) {
+  return Object.entries(bundledAssets)
+    .filter(([path]) => match.test(path))
+    .map(([, url]) => url)
+}
+
+// Public-folder media, referenced by literal path at runtime.
+const EVENT_IMAGES = [
+  'stealth-sell', 'code-red', 'phantom', 'charcha', 'webinar', 'matrix',
+].map((n) => `/event-images/${n}.jpg`)
+
+// Mirrors GALLERY_PHOTOS in sections/GalleryPage/tunnel/engine.ts
+const GALLERY_PHOTOS = Array.from(
+  { length: 50 },
+  (_, i) => `/gallery-photos/gal-${String(i + 1).padStart(2, '0')}.jpg`,
+)
 
 const FONT_URL = '/fonts/Anton-Regular.ttf'
+
+// Tier 1 — on screen the instant the preloader lifts.
+const TIER_HOME_CRITICAL = [
+  ...bundled(/assets\/(LEAD|LEAD_white|hero)\.(png|svg)$/i),
+  '/LEAD_white.png',
+  '/icons.svg',
+  '/favicon.svg',
+]
+
+// Tier 2 — Home, but below the fold (footer art).
+const TIER_HOME_DEFERRED = [
+  ...bundled(/assets\/mascot-nbg\.webp$/i),
+  '/mascot.png',
+]
+
+// Tier 3 — the routes a visitor reaches next.
+const TIER_ROUTES = [
+  ...bundled(/assets\/(team|sponsors)\//i),
+]
+
+// Tier 4 — the big WebGL texture sets.
+const TIER_HEAVY = [...EVENT_IMAGES, ...GALLERY_PHOTOS]
 
 function preloadImage(url, priority = 'low') {
   return new Promise((resolve) => {
@@ -57,15 +97,47 @@ function preloadFont() {
   }
 }
 
+/**
+ * Download `urls` at most `limit` at a time. Unbounded parallel fetches on a
+ * phone connection queue up behind each other and stall the preloader video,
+ * so the heavy tiers are deliberately throttled.
+ */
+function warmTier(urls, { priority = 'low', limit = 6 } = {}) {
+  if (!urls.length) return Promise.resolve()
+  let cursor = 0
+  const next = () => {
+    if (cursor >= urls.length) return Promise.resolve()
+    const url = urls[cursor++]
+    return preloadImage(url, priority).then(next)
+  }
+  return Promise.all(
+    Array.from({ length: Math.min(limit, urls.length) }, next)
+  ).then(() => {})
+}
+
+// Run a tier when the browser is otherwise idle, so background warming never
+// competes with rendering or user interaction.
+function whenIdle(fn) {
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(() => fn(), { timeout: 3000 })
+  } else {
+    setTimeout(fn, 200)
+  }
+}
+
 let warmupPromise = null
+let backgroundStarted = false
 
 /**
- * Kick off the background warm-up. Safe to call more than once — every caller
- * gets the same underlying promise, which settles when the warm-up actually
- * finishes (so StrictMode's double-mount neither double-fetches nor lets a
- * second caller believe the work is already done).
+ * Kick off the warm-up. Safe to call more than once — every caller gets the
+ * same underlying promise, which settles once the *Home-critical* tier is
+ * ready (so StrictMode's double-mount neither double-fetches nor lets a second
+ * caller believe the work is already done).
  *
- * @returns {Promise<void>} resolves when the warm-up settles
+ * The remaining tiers keep downloading in the background after this resolves;
+ * the preloader deliberately does not wait on them.
+ *
+ * @returns {Promise<void>} resolves when Home is ready to paint
  */
 export function prefetchSiteAssets() {
   if (typeof window === 'undefined') return Promise.resolve()
@@ -74,22 +146,25 @@ export function prefetchSiteAssets() {
 }
 
 function startWarmup() {
-
-  const bundled = Object.values(bundledAssets)
-  const urls = [...bundled, ...publicAssets]
-
-  // The nav logo is on screen the instant the preloader lifts — fetch it first
-  // and at normal priority; everything else trickles in behind the video.
-  const logo = bundled.find((u) => /LEAD(?!_white)/i.test(u))
-
-  const work = [
-    logo ? preloadImage(logo, 'high') : Promise.resolve(),
+  // Tier 1 at high priority — this is what the reveal actually waits on.
+  const critical = Promise.allSettled([
     preloadFont(),
-    ...urls.map((u) => preloadImage(u, 'low')),
-  ]
+    warmTier(TIER_HOME_CRITICAL, { priority: 'high', limit: 4 }),
+  ])
+    .then(() => document.fonts?.ready?.catch?.(() => {}) ?? undefined)
+    .then(() => {})
 
-  return Promise.allSettled(work).then(() => {
-    // also let the browser settle any CSS-declared webfonts (Google Fonts, etc.)
-    return document.fonts?.ready?.catch?.(() => {}) ?? undefined
-  }).then(() => {})
+  // Everything else trickles in behind it, tier by tier, during idle time.
+  critical.then(() => {
+    if (backgroundStarted) return
+    backgroundStarted = true
+    whenIdle(() => {
+      warmTier(TIER_HOME_DEFERRED, { limit: 4 })
+        .then(() => warmTier(TIER_ROUTES, { limit: 6 }))
+        .then(() => warmTier(TIER_HEAVY, { limit: 4 }))
+        .catch(() => {})
+    })
+  })
+
+  return critical
 }

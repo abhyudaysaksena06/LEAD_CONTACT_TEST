@@ -11,12 +11,17 @@
   --paper: #e8e9f0;
   --accent: var(--lead-accent, #aa3bff);
   --mono: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Menlo, Consolas, monospace;
+  /* Height reserved for the copyright band, so the corner art on desktop is
+     anchored *above* it instead of bleeding across it. Generous enough to also
+     clear the mascot's 15deg rotation, which pushes its bottom-right corner
+     lower than its layout box. */
+  --copy-band: 10rem;
 
   position: relative;
   z-index: 1;
   border-top: 1px solid var(--line);
   background: #000; /* pure black so the mascot art's backdrop blends seamlessly */
-  overflow: hidden; /* clip the mascot art sinking past the corner */
+  overflow: hidden; /* clip the mascot where it bleeds past the left edge */
 }
 
 /* ===== Ribbon ===== */
@@ -37,19 +42,17 @@
 .lead-footer__marquee-item {
   display: inline-flex;
   align-items: center;
-  gap: 1.25rem;
-  margin: 0 1.25rem;
+  gap: 0.75rem;
+  margin: 0 0.75rem;
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.18em;
   color: #ffffff;
   white-space: nowrap;
 }
 
-.lead-footer__marquee-star {
-  opacity: 0.55;
-}
+.lead-footer__marquee-star { opacity: 0.55; }
 
 @keyframes lead-footer-scroll {
   from { transform: translateX(0); }
@@ -60,129 +63,49 @@
   .lead-footer__marquee { animation: none; }
 }
 
-/* ===== Body ===== */
+/* =========================================================================
+   MOBILE-FIRST LAYOUT
+   The inner shell is a flex column with an explicit running order, so the
+   copyright is genuinely the last thing in the footer on every screen:
+       1. link columns   2. decorative art   3. copyright
+   ========================================================================= */
 .lead-footer__inner {
   position: relative;
   max-width: 80rem;
   margin: 0 auto;
-  /* extra bottom room so the corner mascot never overlaps the content */
-  padding: 2.5rem 1.5rem 15rem;
+  padding: 2rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
-@media (min-width: 1024px) {
-  .lead-footer__inner { padding-top: 2.5rem; padding-bottom: 2.5rem; }
-}
+.lead-footer__body { order: 1; }
+.lead-footer__art  { order: 2; }
+.lead-footer__copy { order: 3; }
 
-/* ===== Mascot — small, pinned to the bottom-left corner on every screen ===== */
-/* The source art has a black background that blends into the pure-black footer,
-   so the empty base can sink past the corner and only the character shows. */
-/* Big LEAD wordmark anchored to the left (mobile-safe defaults; exact
-   placement below at the desktop breakpoint). Starts dull, lights up on scroll. */
-.lead-footer__biglogo {
-  position: absolute;
-  left: -1.5rem;
-  bottom: 11rem;
-  width: min(90vw, 35rem);
-  height: auto;
-  z-index: 1;
-  pointer-events: none;
-  user-select: none;
-  filter: brightness(0.32) saturate(0.7);
-  opacity: 0.8;
-  transition: filter 0.9s ease 0.15s, opacity 0.9s ease 0.15s;
-}
-
-.lead-footer.is-inview .lead-footer__biglogo {
-  filter: brightness(1.05) saturate(1) drop-shadow(0 0 22px rgba(255, 255, 255, 0.28));
-  opacity: 1;
-}
-
-/* Mascot (transparent art) emerging from the bottom-left corner, tilted right.
-   Sits above the logo so it overlaps it. Pops up from the bottom on scroll. */
-.lead-footer__mascot {
-  position: absolute;
-  left: -8vw;                  /* bleed off the left edge — emerging from the corner */
-  bottom: -1.8rem;             /* bleed off the bottom edge */
-  width: min(82vw, 17rem);
-  height: auto;
-  transform: translateY(118%) rotate(15deg);  /* start below the fold */
-  transform-origin: bottom left;
-  z-index: 2;
-  pointer-events: auto;        /* clickable — links to registration */
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease;
-}
-
-/* Wrapper link keeps no box of its own so the img positions against the footer */
-.lead-footer__mascot-link {
-  display: contents;
-}
-
-.lead-footer__mascot-link:hover .lead-footer__mascot {
-  filter: drop-shadow(0 0 26px rgba(170, 59, 255, 0.5));
-}
-
-.lead-footer.is-inview .lead-footer__mascot {
-  transform: translateY(0) rotate(15deg);      /* pop up into place */
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lead-footer__mascot { transform: translateY(0) rotate(15deg); transition: none; }
-  .lead-footer__biglogo { filter: none; opacity: 1; transition: none; }
-}
-
-/* Exact placement tuned on desktop */
-@media (min-width: 1024px) {
-  .lead-footer__biglogo {
-    left: -3.8rem;
-    bottom: 15.25rem;
-    width: 35rem;
-  }
-  .lead-footer__mascot {
-    left: -10.7rem;
-    bottom: -1.8rem;
-    width: 17rem;
-  }
-}
-
+/* ===== Link / text columns ===== */
 .lead-footer__body {
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  gap: 2rem;
   align-items: flex-start;
-}
-
-@media (min-width: 1024px) {
-  .lead-footer__body {
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
-    padding-left: 33rem;   /* clear the big logo + corner mascot on the left */
-  }
 }
 
 .lead-footer__grid {
   display: grid;
-  gap: 2.5rem;
-  grid-template-columns: 1fr 1fr;
+  gap: 1.75rem 1.25rem;
+  grid-template-columns: 1fr;
   width: 100%;
 }
 
-@media (min-width: 1024px) {
-  .lead-footer__grid {
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(9rem, 1fr));
-    gap: 2.5rem 3.5rem;
-    text-align: right;
-  }
-  .lead-footer__links { align-items: flex-end; }
+/* Very small phones stay single-column; from 400px up two columns fit. */
+@media (min-width: 400px) {
+  .lead-footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .lead-footer__label {
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.7rem;
   font-family: var(--mono);
-  font-size: 0.69rem;
+  font-size: 0.66rem;
   color: var(--fog);
   letter-spacing: 0.05em;
 }
@@ -199,7 +122,7 @@
 .lead-footer__link {
   position: relative;
   display: inline-block;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: rgba(232, 233, 240, 0.8);
   text-decoration: none;
   transition: color 0.25s ease;
@@ -218,36 +141,115 @@
   transition: transform 0.3s ease;
 }
 
-.lead-footer__link:hover {
-  color: var(--accent);
-}
-
-.lead-footer__link:hover::after {
-  transform: scaleX(1);
-}
+.lead-footer__link:hover { color: var(--accent); }
+.lead-footer__link:hover::after { transform: scaleX(1); }
 
 .lead-footer__note {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   line-height: 1.6;
   color: rgba(232, 233, 240, 0.8);
 }
 
-/* ===== Terminal baseline / copyright ===== */
+/* ===== Decorative art band (mobile/tablet) =====
+   Mascot on the left bleeding off the edge, wordmark beside it. Both sit in
+   normal flow, so neither can be clipped by the viewport nor overlap text. */
+.lead-footer__art {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40% 1fr;
+  align-items: end;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 3rem;
+}
+
+.lead-footer__mascot-link {
+  display: block;
+  min-width: 0;
+  line-height: 0;
+}
+
+.lead-footer__mascot {
+  display: block;
+  width: 118%;
+  max-width: none;
+  height: auto;
+  margin-left: -18%;            /* bleed off the left edge */
+  transform: translateY(26%) rotate(8deg);
+  transform-origin: bottom left;
+  opacity: 0;
+  cursor: pointer;
+  user-select: none;
+  /* Resting state declares the same two shadow layers at zero alpha, so the
+     hover glow interpolates smoothly instead of popping in from `none`. */
+  filter: drop-shadow(0 0 18px rgba(170, 59, 255, 0))
+          drop-shadow(0 0 46px rgba(170, 59, 255, 0));
+  transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.6s ease,
+              filter 0.75s cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.lead-footer.is-inview .lead-footer__mascot {
+  transform: translateY(0) rotate(8deg);
+  opacity: 1;
+}
+
+/* Only on devices that genuinely hover — otherwise a tap leaves the glow
+   stuck on until the user taps elsewhere. */
+@media (hover: hover) {
+  .lead-footer__mascot-link:hover .lead-footer__mascot {
+    filter: drop-shadow(0 0 18px rgba(170, 59, 255, 0.2))
+            drop-shadow(0 0 46px rgba(170, 59, 255, 0.13));
+  }
+}
+
+.lead-footer__biglogo {
+  display: block;
+  width: 100%;
+  max-width: 15rem;
+  height: auto;
+  justify-self: center;
+  margin-bottom: 0.75rem;
+  pointer-events: none;
+  user-select: none;
+  filter: brightness(0.32) saturate(0.7);
+  opacity: 0.8;
+  transition: filter 0.9s ease 0.15s, opacity 0.9s ease 0.15s;
+}
+
+.lead-footer.is-inview .lead-footer__biglogo {
+  filter: brightness(1.05) saturate(1) drop-shadow(0 0 22px rgba(255, 255, 255, 0.28));
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Drop the travel/reveal animation, but keep the glow cross-fade: it is a
+     colour change, not motion, and removing it makes the hover snap on. */
+  .lead-footer__mascot {
+    transform: translateY(0) rotate(8deg);
+    opacity: 1;
+    transition: filter 0.75s cubic-bezier(0.33, 0, 0.2, 1);
+  }
+  .lead-footer__biglogo { opacity: 1; transition: none; }
+}
+
+/* ===== Terminal baseline / copyright — always the last thing on the page ===== */
 .lead-footer__copy {
-  margin: 2.5rem 0 0;
-  padding-top: 1.5rem;
+  position: relative;
+  z-index: 3;                 /* never sits under the decorative art */
+  margin: 2rem 0 0;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--line);
   text-align: center;
   font-family: var(--mono);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   letter-spacing: 0.04em;
   color: var(--fog);
+  background: #000;           /* opaque band, so nothing can show through it */
 }
 
-.lead-footer__copy-mark {
-  color: var(--accent);
-}
+.lead-footer__copy-mark { color: var(--accent); }
 
 .lead-footer__cursor {
   display: inline-block;
@@ -256,6 +258,97 @@
   animation: lead-footer-blink 1.1s step-end infinite;
 }
 
-@keyframes lead-footer-blink {
-  50% { opacity: 0; }
+@keyframes lead-footer-blink { 50% { opacity: 0; } }
+
+/* =========================================================================
+   TABLET  (>= 640px)
+   ========================================================================= */
+@media (min-width: 640px) {
+  .lead-footer__marquee-item {
+    gap: 1.25rem;
+    margin: 0 1.25rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+  }
+
+  .lead-footer__inner { padding: 2.5rem 2rem 2rem; }
+  .lead-footer__body { gap: 2.5rem; }
+  .lead-footer__grid { gap: 2.25rem 2.5rem; }
+
+  .lead-footer__label { font-size: 0.69rem; }
+  .lead-footer__link,
+  .lead-footer__note { font-size: 0.95rem; }
+
+  .lead-footer__art {
+    grid-template-columns: 34% 1fr;
+    gap: 1rem;
+    margin-top: 3.5rem;
+  }
+  .lead-footer__biglogo { max-width: 22rem; margin-bottom: 1rem; }
+
+  .lead-footer__copy {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* =========================================================================
+   DESKTOP (>= 1024px)
+   The art leaves the flow and anchors the bottom-left corner; the link
+   columns move right to clear it. The art stops at --copy-band so the
+   copyright still runs last, full width, with nothing crossing it.
+   ========================================================================= */
+@media (min-width: 1024px) {
+  .lead-footer__inner { padding: 2.5rem 1.5rem 2.5rem; }
+
+  .lead-footer__body {
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding-left: 33rem;   /* clear the big logo + corner mascot on the left */
+    gap: 3rem;
+  }
+
+  .lead-footer__grid {
+    grid-template-columns: repeat(2, minmax(9rem, 1fr));
+    gap: 2.5rem 3.5rem;
+    text-align: right;
+  }
+  .lead-footer__links { align-items: flex-end; }
+
+  /* The wrappers collapse so both images position against .lead-footer__inner */
+  .lead-footer__art { display: contents; }
+  .lead-footer__mascot-link { display: contents; }
+
+  /* Sits fully inside the viewport — a clipped wordmark reads as a bug, not
+     as art — while still clearing the link columns on the right. */
+  .lead-footer__biglogo {
+    position: absolute;
+    left: 0;
+    bottom: calc(var(--copy-band) + 11rem);
+    width: min(32rem, 40vw);
+    max-width: none;
+    margin: 0;
+    z-index: 1;
+  }
+
+  .lead-footer__mascot {
+    position: absolute;
+    left: -10.7rem;
+    bottom: var(--copy-band);
+    width: 17rem;
+    margin: 0;
+    opacity: 1;
+    z-index: 2;
+    transform: translateY(118%) rotate(15deg);
+  }
+
+  .lead-footer.is-inview .lead-footer__mascot {
+    transform: translateY(0) rotate(15deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lead-footer__mascot { transform: translateY(0) rotate(15deg); }
+  }
 }
