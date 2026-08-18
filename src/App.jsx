@@ -20,6 +20,7 @@ import NotFound from './sections/NotFound/NotFound'
 import SiteNav from './components/SiteNav/SiteNav'
 import CommandPalette from './components/CommandPalette/CommandPalette'
 import Preloader from './components/Preloader/Preloader'
+import RegisterPopup from './components/RegisterPopup/RegisterPopup'
 import { CommandPaletteProvider, useCommandPalette } from './context/CommandPaletteContext'
 
 function ScrollToTop() {
@@ -74,6 +75,7 @@ function App() {
       <BrowserRouter>
         <ScrollToTop />
         <SiteChrome />
+        {!booting && <RegisterPopup />}
         <Routes>
           <Route path="/" element={null} />
           <Route path="/events" element={<Events />} />

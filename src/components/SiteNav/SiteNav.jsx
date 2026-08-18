@@ -11,7 +11,6 @@ const centerItems = [
   { to: '/team', label: 'Leadership' },
   { to: '/sponsors', label: 'Network' },
   { to: '/gallery', label: 'Archive' },
-  { to: '/register', label: 'Register' },
 ]
 
 const contactItem = { to: '/contact', label: "Let's Connect" }

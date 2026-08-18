@@ -62,15 +62,15 @@ export default function Footer() {
             between the links and the copyright; on desktop the two images are
             absolutely positioned against .lead-footer__inner instead. */}
         <div className="lead-footer__art">
-          {/* Mascot — clicking it opens highlights */}
+          {/* Mascot — clicking it opens registration */}
           <NavLink
-            to="/events"
+            to="/register"
             className="lead-footer__mascot-link"
-            aria-label="View LEAD Highlights"
+            aria-label="Register for LEAD 2026"
           >
             <img
               src={mascotBanner}
-              alt="LEAD mascot holding an 'Events Coming Soon' banner"
+              alt="LEAD mascot — register for LEAD 2026"
               className="lead-footer__mascot"
             />
           </NavLink>

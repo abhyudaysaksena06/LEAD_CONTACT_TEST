@@ -1,0 +1,204 @@
+/* ============================================================
+   Bottom-right registration nudge. Self-dismissing after 10s.
+   ============================================================ */
+
+.reg-popup {
+  --accent: #49A7C6;
+  --accent-soft: #8EDCF6;
+  --line: rgba(73, 167, 198, 0.28);
+  --mono: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  position: fixed;
+  right: 1.25rem;
+  /* clear of iOS home indicators / Android gesture bars */
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  z-index: 900;              /* under the command palette, above page content */
+
+  width: min(21rem, calc(100vw - 2.5rem));
+  padding: 1.15rem 1.25rem 1.25rem;
+  overflow: hidden;
+
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(8, 10, 12, 0.86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6),
+              0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+              0 0 40px rgba(73, 167, 198, 0.07);
+
+  color: #E9EAF0;
+  font-family: 'Inter', system-ui, sans-serif;
+
+  will-change: transform, opacity;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.4s ease;
+}
+
+/* Enter from below-right, leave the same way. */
+.reg-popup--in  { transform: translate3d(0, 0, 0);        opacity: 1; }
+.reg-popup--out { transform: translate3d(0, 130%, 0);     opacity: 0; }
+
+/* Start position before the "in" class lands. */
+.reg-popup:not(.reg-popup--in) { transform: translate3d(0, 130%, 0); opacity: 0; }
+
+/* ===== Countdown rail ===== */
+.reg-popup__timer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+}
+
+.reg-popup--in .reg-popup__timer {
+  animation: reg-popup-countdown 10s linear forwards;
+}
+
+@keyframes reg-popup-countdown {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+/* ===== Close ===== */
+.reg-popup__close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  display: inline-flex;
+  padding: 0.35rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(233, 234, 240, 0.5);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.reg-popup__close:hover {
+  color: #E9EAF0;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* ===== Content ===== */
+.reg-popup__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--accent-soft);
+}
+
+.reg-popup__title {
+  margin: 0 0 0.4rem;
+  padding-right: 1.5rem;      /* clear the close button */
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.reg-popup__accent {
+  background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.reg-popup__body {
+  margin: 0 0 0.95rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgba(233, 234, 240, 0.68);
+}
+
+/* Primary action: full width and a comfortable tap target (44px+), so it
+   reads unmistakably as a button rather than an inline link. */
+.reg-popup__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(73, 167, 198, 0.65);
+  border-radius: 11px;
+  background: linear-gradient(180deg, rgba(73, 167, 198, 0.34), rgba(73, 167, 198, 0.2));
+  box-shadow: 0 6px 18px rgba(73, 167, 198, 0.18),
+              0 1px 0 rgba(255, 255, 255, 0.09) inset;
+  color: #FFFFFF;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease,
+              box-shadow 0.25s ease, transform 0.18s ease;
+}
+
+.reg-popup__cta:hover {
+  background: linear-gradient(180deg, rgba(73, 167, 198, 0.48), rgba(73, 167, 198, 0.3));
+  border-color: rgba(142, 220, 246, 0.85);
+  box-shadow: 0 8px 24px rgba(73, 167, 198, 0.28),
+              0 1px 0 rgba(255, 255, 255, 0.14) inset;
+}
+
+.reg-popup__cta:active { transform: translateY(1px); }
+
+.reg-popup__cta:focus-visible {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 2px;
+}
+
+.reg-popup__cta svg { transition: transform 0.25s ease; }
+.reg-popup__cta:hover svg { transform: translateX(3px); }
+
+/* Secondary, deliberately quiet */
+.reg-popup__later {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.45rem;
+  border: 0;
+  background: transparent;
+  color: rgba(233, 234, 240, 0.45);
+  font-family: inherit;
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.reg-popup__later:hover { color: rgba(233, 234, 240, 0.8); }
+
+/* Paused while hovered/focused: freeze the countdown so the card cannot
+   disappear from under the cursor mid-click. */
+.reg-popup--held .reg-popup__timer { animation-play-state: paused; }
+
+/* ===== Small screens — span the width, sit above the fold ===== */
+@media (max-width: 480px) {
+  .reg-popup {
+    right: 0.75rem;
+    left: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    padding: 1rem 1.1rem 1.1rem;
+  }
+  .reg-popup__title { font-size: 0.96rem; }
+}
+
+/* ===== Reduced motion — fade only, no travel ===== */
+@media (prefers-reduced-motion: reduce) {
+  .reg-popup,
+  .reg-popup:not(.reg-popup--in) {
+    transform: none;
+    transition: opacity 0.3s ease;
+  }
+  .reg-popup--out { transform: none; opacity: 0; }
+  .reg-popup--in .reg-popup__timer { animation: none; }
+}
