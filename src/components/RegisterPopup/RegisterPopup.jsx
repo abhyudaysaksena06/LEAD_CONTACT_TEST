@@ -44,6 +44,56 @@ export default function RegisterPopup() {
     return () => clearTimeout(leave)
   }, [phase, held])
 
+  // Dismiss as soon as the footer comes into view. The popup is fixed to the
+  // bottom-left and the footer's mascot occupies that same corner, so leaving
+  // it up there would cover the artwork — and by then the visitor has the
+  // footer's own registration link anyway.
+  useEffect(() => {
+    if (phase !== 'in') return
+
+    // A footer inside a display:none branch (Home kept alive behind another
+    // route) reports a zero-height rect, so it can never match.
+    const footerInView = () => {
+      for (const f of document.querySelectorAll('.lead-footer')) {
+        const r = f.getBoundingClientRect()
+        if (r.height > 0 && r.top < window.innerHeight && r.bottom > 0) return true
+      }
+      return false
+    }
+
+    // Covers the case where the visitor is already down at the footer by the
+    // time the popup is due to appear.
+    if (footerInView()) { setPhase('out'); return }
+
+    let io
+    let timer
+
+    // The footer belongs to a route component and may mount after the popup,
+    // so retry briefly rather than giving up on the first miss.
+    let attempts = 0
+    const attach = () => {
+      const footers = [...document.querySelectorAll('.lead-footer')]
+        .filter((f) => f.getBoundingClientRect().height > 0)
+
+      if (!footers.length) {
+        if (attempts++ < 20) timer = setTimeout(attach, 250)
+        return
+      }
+
+      io = new IntersectionObserver(
+        (entries) => { if (entries.some((e) => e.isIntersecting)) setPhase('out') },
+        { threshold: 0 },
+      )
+      footers.forEach((f) => io.observe(f))
+    }
+    attach()
+
+    return () => {
+      clearTimeout(timer)
+      io?.disconnect()
+    }
+  }, [phase])
+
   // Unmount after the exit transition has run.
   useEffect(() => {
     if (phase !== 'out') return

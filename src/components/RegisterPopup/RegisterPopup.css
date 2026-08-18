@@ -9,7 +9,7 @@
   --mono: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Menlo, Consolas, monospace;
 
   position: fixed;
-  right: 1.25rem;
+  left: 1.25rem;
   /* clear of iOS home indicators / Android gesture bars */
   bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
   z-index: 900;              /* under the command palette, above page content */
