@@ -192,7 +192,7 @@ function Dashboard({ session }) {
     const q = query.trim().toLowerCase()
     if (!q) return rows
     return rows.filter((r) =>
-      [r.full_name, r.email, r.phone, r.admission_number, r.branch]
+      [r.full_name, r.email, r.phone, r.admission_number, r.branch, r.vibe_check]
         .some((v) => String(v ?? '').toLowerCase().includes(q))
     )
   }, [rows, query])
@@ -209,7 +209,7 @@ function Dashboard({ session }) {
   }, [rows])
 
   const exportCsv = () => {
-    const cols = ['created_at', 'full_name', 'phone', 'email', 'admission_number', 'branch']
+    const cols = ['created_at', 'full_name', 'phone', 'email', 'admission_number', 'branch', 'vibe_check']
     const esc = (v) => {
       const s = v == null ? '' : String(v)
       return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
@@ -296,16 +296,17 @@ function Dashboard({ session }) {
                 <th>Branch</th>
                 <th>Phone</th>
                 <th>Email</th>
+                <th>Coke + Maggi</th>
                 <th aria-label="Actions" />
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr><td colSpan={7} className="admin-empty">Loading…</td></tr>
+                <tr><td colSpan={8} className="admin-empty">Loading…</td></tr>
               )}
               {!loading && !filtered.length && (
                 <tr>
-                  <td colSpan={7} className="admin-empty">
+                  <td colSpan={8} className="admin-empty">
                     {rows.length ? 'No matches for that search.' : 'No registrations yet.'}
                   </td>
                 </tr>
@@ -320,6 +321,7 @@ function Dashboard({ session }) {
                     <a href={`tel:${r.phone}`}>{r.phone}</a>
                   </td>
                   <td><a href={`mailto:${r.email}`}>{r.email}</a></td>
+                  <td className="admin-dim">{r.vibe_check ?? '—'}</td>
                   <td>
                     <button
                       className="admin-icon-btn"

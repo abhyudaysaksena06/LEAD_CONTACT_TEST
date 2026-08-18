@@ -24,12 +24,21 @@ const BRANCHES = [
   'Other',
 ]
 
+// Icebreaker. Stored as the plain answer; the A)-D) letters are display only.
+const VIBE_OPTIONS = [
+  'Absolutely not',
+  'Weirdly valid',
+  'I need to try this',
+  'Who hurt you?',
+]
+
 const EMPTY = {
   full_name: '',
   phone: '',
   email: '',
   admission_number: '',
   branch: '',
+  vibe_check: '',
 }
 
 /** Field-level rules. Returns an error string, or '' when the value is valid. */
@@ -54,6 +63,9 @@ function validateField(name, raw) {
       return ''
     case 'branch':
       if (!value) return 'Please select your branch.'
+      return ''
+    case 'vibe_check':
+      if (!value) return 'Pick one — no wrong answers.'
       return ''
     default:
       return ''
@@ -98,7 +110,7 @@ function GlassField({ label, name, value, error, onChange, onBlur, ...rest }) {
   )
 }
 
-function GlassSelect({ label, name, value, error, onChange, onBlur, options }) {
+function GlassSelect({ label, name, value, error, onChange, onBlur, options, placeholder, lettered = false }) {
   const ref = useRef(null)
   const { rotate, reflect, isHovered } = useMouseParallax(ref, { maxRotation: 3 })
   const style = {
@@ -127,8 +139,12 @@ function GlassSelect({ label, name, value, error, onChange, onBlur, options }) {
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${name}-error` : undefined}
         >
-          <option value="" disabled>Select your branch</option>
-          {options.map((b) => <option key={b} value={b}>{b}</option>)}
+          <option value="" disabled>{placeholder}</option>
+          {options.map((opt, i) => (
+            <option key={opt} value={opt}>
+              {lettered ? `${String.fromCharCode(65 + i)}) ${opt}` : opt}
+            </option>
+          ))}
         </select>
         <div className="input-glow-border" />
       </div>
@@ -198,6 +214,7 @@ export default function RegisterPage() {
       email: form.email.trim().toLowerCase(),
       admission_number: form.admission_number.trim().toUpperCase(),
       branch: form.branch,
+      vibe_check: form.vibe_check,
     })
     setSubmitting(false)
 
@@ -313,8 +330,21 @@ export default function RegisterPage() {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     options={BRANCHES}
+                    placeholder="Select your branch"
                   />
                 </div>
+
+                <GlassSelect
+                  label="Coke + Maggi — hear me out…"
+                  name="vibe_check"
+                  value={form.vibe_check}
+                  error={errors.vibe_check}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  options={VIBE_OPTIONS}
+                  placeholder="Pick one"
+                  lettered
+                />
 
                 {formError && <p className="register-form-error" role="alert">{formError}</p>}
 
