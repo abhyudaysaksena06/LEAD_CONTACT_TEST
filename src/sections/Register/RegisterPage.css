@@ -1,0 +1,135 @@
+/* ============================================================
+   Registration page.
+   Reuses the Contact page's design tokens by also carrying the
+   .contact-page class, so only the layout specific to this page
+   is defined here.
+   ============================================================ */
+
+.register-page {
+  display: block;              /* Contact centres a 3-panel platform; this is a single column */
+  padding: 140px 20px 80px;
+  min-height: 100vh;
+}
+
+.register-main {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 46rem;
+  margin: 0 auto;
+}
+
+/* ===== Header ===== */
+.register-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.register-heading {
+  margin: 1.25rem 0 0.75rem;
+  font-family: var(--font-title);
+  font-weight: 800;
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.register-sub {
+  margin: 0 auto;
+  max-width: 34rem;
+  font-size: clamp(0.9rem, 2.4vw, 1rem);
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* ===== Card ===== */
+.register-card {
+  position: relative;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55),
+              0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.register-field { width: 100%; min-width: 0; }
+
+/* Two-up on tablet and wider; stacked on phones so nothing is cramped. */
+.register-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.15rem;
+}
+
+@media (min-width: 640px) {
+  .register-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* The select must match the glass text inputs it sits beside. */
+.register-select {
+  width: 100%;
+  padding-left: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  /* room for the chevron */
+  padding-right: 2.5rem;
+  background-image: linear-gradient(45deg, transparent 50%, var(--accent-lavender) 50%),
+                    linear-gradient(135deg, var(--accent-lavender) 50%, transparent 50%);
+  background-position: calc(100% - 20px) center, calc(100% - 14px) center;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.register-select option {
+  background: #0A0A0A;
+  color: var(--text-primary);
+}
+
+/* ===== Validation ===== */
+.glass-input-wrapper.has-error {
+  border-color: rgba(255, 105, 120, 0.55);
+}
+
+.register-error {
+  margin: 0.45rem 0 0;
+  padding-left: 4px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #ff8a94;
+}
+
+.register-form-error {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 105, 120, 0.35);
+  border-radius: 12px;
+  background: rgba(255, 105, 120, 0.08);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #ff9aa3;
+}
+
+.register-privacy {
+  margin: 0.25rem 0 0;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* ===== Small screens ===== */
+@media (max-width: 640px) {
+  .register-page { padding: 120px 16px 60px; }
+  .register-header { margin-bottom: 1.75rem; }
+}

@@ -25,3 +25,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Supabase direct DB connection URI (contains the DB password)
+supabase/.env.db
+registrations.csv

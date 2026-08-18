@@ -6,6 +6,8 @@ import Home from './sections/Home/Home'
 import Team from './sections/Team'
 import ArcReactor from './sections/Sponsors/ArcReactor'
 import Contact from './sections/Contact/ContactPage'
+import Register from './sections/Register/RegisterPage'
+import Admin from './sections/Admin/AdminPage'
 import { SPONSORS_DATA } from './data/sponsorsData'
 
 // ===== Pages imported from the SourcePage Events / PhotoGallery projects =====
@@ -26,6 +28,19 @@ function ScrollToTop() {
     window.scrollTo(0, 0)
   }, [pathname])
   return null
+}
+
+function SiteChrome() {
+  // /admin is a standalone console — no marketing nav or persistent Home behind it.
+  const { pathname } = useLocation()
+  if (pathname === '/admin') return null
+  return (
+    <>
+      <SiteNav />
+      <GlobalCommandPalette />
+      <PersistentHome />
+    </>
+  )
 }
 
 function GlobalCommandPalette() {
@@ -58,9 +73,7 @@ function App() {
       {booting && <Preloader onComplete={handlePreloaderComplete} />}
       <BrowserRouter>
         <ScrollToTop />
-        <SiteNav />
-        <GlobalCommandPalette />
-        <PersistentHome />
+        <SiteChrome />
         <Routes>
           <Route path="/" element={null} />
           <Route path="/events" element={<Events />} />
@@ -68,6 +81,9 @@ function App() {
           <Route path="/sponsors" element={<ArcReactor sponsors={SPONSORS_DATA} />} />
           <Route path="/gallery" element={<GalleryTunnel />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/register" element={<Register />} />
+          {/* Unlisted: no nav entry, no sitemap. Protected by Supabase Auth + RLS. */}
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
