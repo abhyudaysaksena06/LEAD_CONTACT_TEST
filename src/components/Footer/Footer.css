@@ -300,55 +300,93 @@
    copyright still runs last, full width, with nothing crossing it.
    ========================================================================= */
 @media (min-width: 1024px) {
-  .lead-footer__inner { padding: 2.5rem 1.5rem 2.5rem; }
+  /* Everything stays in flow on a two-column grid. The art was previously
+     absolutely positioned with hand-tuned offsets, which overflowed upward
+     into the ribbon whenever the link columns were shorter than the offsets
+     assumed. Laying it out properly makes that impossible by construction. */
+  .lead-footer__inner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "art   links"
+      "copy  copy";
+    align-items: end;
+    column-gap: clamp(2rem, 5vw, 5rem);
+    padding: 3rem 1.5rem 2.5rem;
+  }
+
+  /* Single cell: the mascot and the wordmark are stacked on top of each other
+     on purpose. Keeping them in flow (rather than absolutely positioned) is
+     what stops the pair drifting up into the ribbon — the row grows to fit
+     them instead. */
+  .lead-footer__art {
+    grid-area: art;
+    display: grid;
+    grid-template-columns: auto;
+    align-items: end;
+    /* pushes the whole art group down, clear of the ribbon */
+    padding-top: 3.5rem;
+    width: auto;
+    margin: 0;
+  }
+
+  .lead-footer__mascot-link {
+    display: block;
+    line-height: 0;
+    grid-area: 1 / 1;          /* same cell as the wordmark */
+    align-self: end;
+    justify-self: start;
+    z-index: 2;
+  }
+
+  .lead-footer__mascot {
+    position: static;
+    width: clamp(10rem, 13vw, 15rem);
+    /* Leans left past the wordmark's leading edge. Scales with the viewport so
+       it never gets clipped by the container's padding on smaller desktops. */
+    margin: 0 0 0 max(-2.5rem, -1.2vw);
+    transform: translateY(18%) rotate(8deg);
+    transform-origin: bottom left;
+    opacity: 0;
+  }
+
+  .lead-footer.is-inview .lead-footer__mascot {
+    transform: translateY(0) rotate(8deg);
+    opacity: 1;
+  }
+
+  .lead-footer__biglogo {
+    position: static;
+    grid-area: 1 / 1;          /* stacked under the mascot */
+    align-self: end;
+    justify-self: start;
+    width: clamp(16rem, 22vw, 26rem);
+    max-width: none;
+    /* lifts the wordmark so the mascot overlaps its lower-left corner */
+    margin: 0 0 3rem 3.5rem;
+    z-index: 1;
+  }
 
   .lead-footer__body {
+    grid-area: links;
     flex-direction: row;
     justify-content: flex-end;
-    align-items: center;
-    padding-left: 33rem;   /* clear the big logo + corner mascot on the left */
+    align-items: flex-end;
+    padding-left: 0;
     gap: 3rem;
   }
 
   .lead-footer__grid {
-    grid-template-columns: repeat(2, minmax(9rem, 1fr));
-    gap: 2.5rem 3.5rem;
+    grid-template-columns: repeat(2, minmax(9rem, auto));
+    justify-content: end;
+    gap: 2.25rem 3.5rem;
     text-align: right;
   }
   .lead-footer__links { align-items: flex-end; }
 
-  /* The wrappers collapse so both images position against .lead-footer__inner */
-  .lead-footer__art { display: contents; }
-  .lead-footer__mascot-link { display: contents; }
-
-  /* Sits fully inside the viewport — a clipped wordmark reads as a bug, not
-     as art — while still clearing the link columns on the right. */
-  .lead-footer__biglogo {
-    position: absolute;
-    left: 0;
-    bottom: calc(var(--copy-band) + 11rem);
-    width: min(32rem, 40vw);
-    max-width: none;
-    margin: 0;
-    z-index: 1;
-  }
-
-  .lead-footer__mascot {
-    position: absolute;
-    left: -10.7rem;
-    bottom: var(--copy-band);
-    width: 17rem;
-    margin: 0;
-    opacity: 1;
-    z-index: 2;
-    transform: translateY(118%) rotate(15deg);
-  }
-
-  .lead-footer.is-inview .lead-footer__mascot {
-    transform: translateY(0) rotate(15deg);
-  }
+  .lead-footer__copy { grid-area: copy; }
 
   @media (prefers-reduced-motion: reduce) {
-    .lead-footer__mascot { transform: translateY(0) rotate(15deg); }
+    .lead-footer__mascot { transform: translateY(0) rotate(8deg); opacity: 1; }
   }
 }
