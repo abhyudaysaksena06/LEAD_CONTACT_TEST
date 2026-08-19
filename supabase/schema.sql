@@ -45,11 +45,15 @@ create index if not exists registrations_created_at_idx
 
 alter table public.registrations enable row level security;
 
+-- INSERT is granted to authenticated as well as anon: the admin console keeps a
+-- persistent session, so an admin browsing the public form sends the
+-- authenticated role rather than anon, and an anon-only policy would deny it.
 drop policy if exists "anon can register" on public.registrations;
-create policy "anon can register"
+drop policy if exists "anyone can register" on public.registrations;
+create policy "anyone can register"
   on public.registrations
   for insert
-  to anon
+  to anon, authenticated
   with check (true);
 
 -- Deliberately NO select/update/delete policy for anon or authenticated.

@@ -186,7 +186,9 @@ export default function RegisterPage() {
         return
       }
       if (error.code === '42501' || /row-level security/i.test(error.message || '')) {
-        setFormError('Registration is blocked by database permissions. The insert policy is missing — run supabase/schema.sql.')
+        // Most often seen by an admin whose /admin session makes this request
+        // arrive as `authenticated` rather than `anon`.
+        setFormError('Registration was blocked by database permissions. Run supabase/fix-insert-policy.sql, which grants insert to signed-in users as well as anonymous ones.')
         return
       }
       setFormError(error.message || 'Could not submit your registration. Please try again.')
