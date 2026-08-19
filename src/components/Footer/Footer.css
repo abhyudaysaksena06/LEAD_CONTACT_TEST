@@ -158,8 +158,9 @@
   position: relative;
   display: grid;
   grid-template-columns: 40% 1fr;
-  align-items: end;
-  gap: 0.5rem;
+  /* Side by side, centred on a shared baseline. */
+  align-items: center;
+  gap: 0.75rem;
   width: 100%;
   margin-top: 3rem;
 }
@@ -177,7 +178,10 @@
   height: auto;
   margin-left: -18%;            /* bleed off the left edge */
   transform: translateY(26%) rotate(8deg);
-  transform-origin: bottom left;
+  align-self: center;
+  /* Rotate about the centre so the tilt expands the box symmetrically and the
+     mascot's optical centre lines up with the wordmark's. */
+  transform-origin: center;
   opacity: 0;
   cursor: pointer;
   user-select: none;
@@ -210,7 +214,8 @@
   max-width: 15rem;
   height: auto;
   justify-self: center;
-  margin-bottom: 0.75rem;
+  align-self: center;
+  margin-bottom: 0;
   pointer-events: none;
   user-select: none;
   filter: brightness(0.32) saturate(0.7);
@@ -294,12 +299,12 @@
 }
 
 /* =========================================================================
-   DESKTOP (>= 1024px)
-   The art leaves the flow and anchors the bottom-left corner; the link
-   columns move right to clear it. The art stops at --copy-band so the
-   copyright still runs last, full width, with nothing crossing it.
+   DESKTOP (>= 1280px)
+   The mascot and wordmark stack into one cell using the hand-tuned offsets.
+   Below this width they fall back to the centred side-by-side band above,
+   because these fixed pixel sizes would crush the link columns there.
    ========================================================================= */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   /* Everything stays in flow on a two-column grid. The art was previously
      absolutely positioned with hand-tuned offsets, which overflowed upward
      into the ribbon whenever the link columns were shorter than the offsets
@@ -341,7 +346,14 @@
 
   .lead-footer__mascot {
     position: static;
-    width: clamp(10rem, 13vw, 15rem);
+    /* Size and nudge are variables so the dev tuner (?tune in development) can
+       drive them live; the fallbacks here are the shipped values. `translate`
+       is used rather than `transform` so it composes with the reveal
+       animation instead of overwriting it. */
+    /* Hand-tuned values. Desktop only — below 1280px the art falls back to the
+       centred side-by-side band, where fixed pixels would crush the links. */
+    width: var(--tune-mascot-w, 213px);
+    translate: var(--tune-mascot-x, -133px) var(--tune-mascot-y, 80px);
     /* Leans left past the wordmark's leading edge. Scales with the viewport so
        it never gets clipped by the container's padding on smaller desktops. */
     margin: 0 0 0 max(-2.5rem, -1.2vw);
@@ -360,7 +372,8 @@
     grid-area: 1 / 1;          /* stacked under the mascot */
     align-self: end;
     justify-self: start;
-    width: clamp(16rem, 22vw, 26rem);
+    width: var(--tune-logo-w, 835px);
+    translate: var(--tune-logo-x, -113px) var(--tune-logo-y, -22px);
     max-width: none;
     /* lifts the wordmark so the mascot overlaps its lower-left corner */
     margin: 0 0 3rem 3.5rem;

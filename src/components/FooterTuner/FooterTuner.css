@@ -1,0 +1,114 @@
+/* Development-only footer tuner. Never rendered in a production build. */
+
+.ft-panel {
+  position: fixed;
+  top: 84px;
+  right: 16px;
+  z-index: 99999;
+  width: 260px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(10, 12, 16, 0.95);
+  backdrop-filter: blur(10px);
+  color: #E9EAF0;
+  font: 12px/1.4 ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+.ft-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ft-hint { color: #7d8496; font-size: 10px; }
+
+.ft-group {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.ft-group.is-active { border-color: rgba(73, 167, 198, 0.7); }
+
+.ft-title { margin: 0 0 6px; color: #8EDCF6; font-size: 11px; }
+
+.ft-row {
+  display: grid;
+  grid-template-columns: 16px 22px 1fr 22px;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.ft-key { color: #7d8496; }
+
+.ft-row button,
+.ft-actions button {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #E9EAF0;
+  font: inherit;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.ft-row button:hover,
+.ft-actions button:hover { background: rgba(255, 255, 255, 0.14); }
+
+.ft-row input {
+  width: 100%;
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #E9EAF0;
+  font: inherit;
+}
+
+.ft-slider { display: block; margin-top: 6px; }
+.ft-slider span { display: block; margin-bottom: 2px; color: #7d8496; }
+.ft-slider input { width: 100%; }
+
+.ft-out {
+  margin: 0 0 8px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #000;
+  color: #9fe8b5;
+  font-size: 10.5px;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.ft-actions { display: flex; gap: 6px; }
+.ft-actions button { flex: 1; padding: 6px; }
+
+.ft-primary {
+  border-color: rgba(73, 167, 198, 0.6) !important;
+  background: rgba(73, 167, 198, 0.2) !important;
+}
+
+.ft-note { margin: 8px 0 0; color: #6b7280; font-size: 10px; }
+
+/* ===== While tuning: make the artwork grabbable ===== */
+.lead-footer--tuning .lead-footer__mascot,
+.lead-footer--tuning .lead-footer__biglogo {
+  cursor: grab;
+  pointer-events: auto !important;   /* the wordmark is normally inert */
+  outline: 1px dashed rgba(73, 167, 198, 0.6);
+  outline-offset: 3px;
+}
+
+.lead-footer--tuning .lead-footer__mascot:active,
+.lead-footer--tuning .lead-footer__biglogo:active { cursor: grabbing; }
+
+/* Freeze the reveal animation so dragging is not fighting a transition. */
+.lead-footer--tuning .lead-footer__mascot,
+.lead-footer--tuning .lead-footer__biglogo { transition: none !important; }

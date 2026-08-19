@@ -22,6 +22,7 @@ import CommandPalette from './components/CommandPalette/CommandPalette'
 import Preloader from './components/Preloader/Preloader'
 import RegisterPopup from './components/RegisterPopup/RegisterPopup'
 import { CommandPaletteProvider, useCommandPalette } from './context/CommandPaletteContext'
+import { prefetchSiteAssets } from './utils/prefetchAssets'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -59,10 +60,26 @@ function PersistentHome() {
   )
 }
 
+// Routes that are landed on directly — usually from a shared link — and should
+// open straight away rather than behind the intro clip.
+const SKIP_PRELOADER = ['/register']
+
 function App() {
   const [booting, setBooting] = useState(() => {
-    return !sessionStorage.getItem('preloader_shown')
+    if (sessionStorage.getItem('preloader_shown')) return false
+    return !SKIP_PRELOADER.includes(window.location.pathname)
   })
+
+  // When the intro is skipped, mark it as seen so navigating to the rest of the
+  // site later in the same session does not suddenly play it, and kick off the
+  // asset warm-up that the preloader would normally have started.
+  useEffect(() => {
+    if (booting) return
+    if (sessionStorage.getItem('preloader_shown')) return
+    sessionStorage.setItem('preloader_shown', 'true')
+    prefetchSiteAssets()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handlePreloaderComplete = () => {
     sessionStorage.setItem('preloader_shown', 'true')

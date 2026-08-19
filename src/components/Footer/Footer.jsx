@@ -3,6 +3,14 @@ import { NavLink } from 'react-router-dom'
 import './Footer.css'
 import mascotBanner from '../../assets/mascot-nbg.webp'
 import leadLogo from '../../assets/LEAD.png'
+import FooterTuner from '../FooterTuner/FooterTuner'
+
+// Dev-only: /?tune enables the drag-and-resize overlay for the footer art.
+// import.meta.env.DEV is statically false in a production build, so the whole
+// branch — and the import — is dropped by the bundler.
+const TUNING = import.meta.env.DEV
+  && typeof window !== 'undefined'
+  && new URLSearchParams(window.location.search).has('tune')
 
 // Footer inspired by the Immersive Learning site: a scrolling accent ribbon,
 // tidy link columns, a giant brand mark with a stroke → fill hover effect, and
@@ -45,6 +53,7 @@ export default function Footer() {
 
   return (
     <footer className="lead-footer" ref={footerRef}>
+      {TUNING && <FooterTuner />}
       {/* Scrolling accent ribbon — L · E · A · D */}
       <div className="lead-footer__ribbon">
         <div className="lead-footer__marquee">
