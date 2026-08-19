@@ -1,0 +1,160 @@
+/* ============================================================
+   Custom dropdown. Matches the glass inputs it sits beside, and
+   renders its own option list so nothing shows OS chrome.
+
+   Every rule is prefixed with .gsel and sets its own padding, so
+   the `.contact-page * { padding: 0 }` reset cannot flatten it.
+   ============================================================ */
+
+.gsel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0.85rem 1.15rem 0.95rem;
+  border: 1px solid rgba(73, 167, 198, 0.2);
+  border-radius: 14px;
+  background: rgba(10, 14, 18, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+              inset 0 -10px 20px rgba(0, 0, 0, 0.3),
+              0 8px 24px rgba(0, 0, 0, 0.55),
+              0 0 10px rgba(73, 167, 198, 0.08);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.gsel:hover { border-color: rgba(73, 167, 198, 0.45); }
+
+.gsel.is-open,
+.gsel:focus-within {
+  border-color: #7ED5F2;
+  box-shadow: 0 0 0 1px rgba(73, 167, 198, 0.35),
+              0 0 28px rgba(73, 167, 198, 0.25),
+              0 12px 25px rgba(0, 0, 0, 0.55);
+}
+
+.gsel.has-error { border-color: rgba(255, 105, 120, 0.55); }
+
+.gsel__label {
+  margin-bottom: 0.5rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: #7ED5F2;
+  text-shadow: 0 0 8px rgba(224, 170, 255, 0.2);
+}
+
+/* ===== Trigger ===== */
+.gsel__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 1.6rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary, #fff);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 1rem;
+  line-height: 1.6;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.gsel__value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gsel__value.is-placeholder { color: var(--text-muted, rgba(255, 255, 255, 0.45)); }
+
+.gsel__chevron {
+  flex: 0 0 auto;
+  color: #8EDCF6;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gsel.is-open .gsel__chevron { transform: rotate(180deg); }
+
+/* ===== Option list ===== */
+.gsel__list {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  max-height: min(17rem, 45vh);
+  margin: 0;
+  padding: 0.35rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+  border: 1px solid rgba(73, 167, 198, 0.35);
+  border-radius: 14px;
+  background: rgba(8, 12, 16, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7),
+              0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  animation: gsel-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes gsel-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gsel__list { animation: none; }
+  .gsel__chevron { transition: none; }
+}
+
+/* Slim scrollbar, themed rather than OS default */
+.gsel__list::-webkit-scrollbar { width: 8px; }
+.gsel__list::-webkit-scrollbar-track { background: transparent; }
+.gsel__list::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: content-box;
+  background-color: rgba(73, 167, 198, 0.35);
+}
+.gsel__list { scrollbar-width: thin; scrollbar-color: rgba(73, 167, 198, 0.35) transparent; }
+
+.gsel__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  /* comfortable 40px+ target for touch */
+  min-height: 2.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  color: rgba(232, 233, 240, 0.85);
+  font-size: 0.92rem;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.gsel__option.is-active {
+  background: rgba(73, 167, 198, 0.18);
+  color: #fff;
+}
+
+.gsel__option.is-selected { color: #8EDCF6; }
+
+.gsel__tick { flex: 0 0 auto; color: #8EDCF6; }
+
+/* ===== Small screens ===== */
+@media (max-width: 640px) {
+  .gsel { padding: 0.8rem 1rem 0.9rem; }
+  .gsel__trigger { font-size: 0.95rem; }
+  .gsel__list { max-height: min(15rem, 50vh); }
+  .gsel__option { font-size: 0.9rem; min-height: 2.75rem; }
+}

@@ -3,6 +3,7 @@ import { CheckCircle, ArrowRight } from 'lucide-react'
 import Background from '../Contact/components/Background/Background'
 import useMouseParallax from '../Contact/hooks/useMouseParallax'
 import Footer from '../../components/Footer/Footer'
+import GlassSelect from '../../components/GlassSelect/GlassSelect'
 import { supabase, isSupabaseConfigured, missingSupabaseConfig } from '../../lib/supabaseClient'
 import '../Contact/components/CenterPanel/ContactForm.css'
 import './RegisterPage.css'
@@ -103,49 +104,6 @@ function GlassField({ label, name, value, error, onChange, onBlur, ...rest }) {
           aria-describedby={error ? `${name}-error` : undefined}
           {...rest}
         />
-        <div className="input-glow-border" />
-      </div>
-      {error && <p className="register-error" id={`${name}-error`}>{error}</p>}
-    </div>
-  )
-}
-
-function GlassSelect({ label, name, value, error, onChange, onBlur, options, placeholder, lettered = false }) {
-  const ref = useRef(null)
-  const { rotate, reflect, isHovered } = useMouseParallax(ref, { maxRotation: 3 })
-  const style = {
-    '--input-rot-x': `${rotate.x}deg`,
-    '--input-rot-y': `${rotate.y}deg`,
-    '--input-reflect-x': `${reflect.x}%`,
-    '--input-reflect-y': `${reflect.y}%`,
-  }
-
-  return (
-    <div className="register-field">
-      <div
-        ref={ref}
-        className={`glass-input-wrapper ${isHovered ? 'hovered' : ''} ${error ? 'has-error' : ''}`}
-        style={style}
-      >
-        <div className="input-reflection" />
-        <label className="input-label" htmlFor={name}>{label}</label>
-        <select
-          id={name}
-          name={name}
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-          className="glass-input-field register-select"
-          aria-invalid={Boolean(error)}
-          aria-describedby={error ? `${name}-error` : undefined}
-        >
-          <option value="" disabled>{placeholder}</option>
-          {options.map((opt, i) => (
-            <option key={opt} value={opt}>
-              {lettered ? `${String.fromCharCode(65 + i)}) ${opt}` : opt}
-            </option>
-          ))}
-        </select>
         <div className="input-glow-border" />
       </div>
       {error && <p className="register-error" id={`${name}-error`}>{error}</p>}

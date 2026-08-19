@@ -22,11 +22,11 @@
 /* ===== Header ===== */
 .register-header {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 .register-heading {
-  margin: 1.25rem 0 0.75rem;
+  margin: 1.5rem 0 1rem;
   font-family: var(--font-title);
   font-weight: 800;
   font-size: clamp(2rem, 6vw, 3.25rem);
@@ -39,14 +39,14 @@
   margin: 0 auto;
   max-width: 34rem;
   font-size: clamp(0.9rem, 2.4vw, 1rem);
-  line-height: 1.65;
+  line-height: 1.7;
   color: var(--text-secondary);
 }
 
 /* ===== Card ===== */
 .register-card {
   position: relative;
-  padding: clamp(1.25rem, 4vw, 2.25rem);
+  padding: clamp(1.5rem, 4vw, 2.75rem);
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   background: var(--bg-glass);
@@ -59,16 +59,70 @@
 .register-form {
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
+  gap: 1.5rem;
 }
 
 .register-field { width: 100%; min-width: 0; }
+
+/* ===== Field internals =====
+   ContactPage.css applies `.contact-page * { margin: 0; padding: 0 }`, and this
+   page carries .contact-page for its design tokens. That reset has the same
+   specificity as .glass-input-wrapper, so it was stripping the field padding
+   and the label's spacing, collapsing every input to ~34px tall. These rules
+   are scoped one level deeper so they win, and set the real rhythm. */
+.register-page .glass-input-wrapper {
+  padding: 0.85rem 1.15rem 0.95rem;
+  border-radius: 14px;
+  gap: 0;
+}
+
+.register-page .input-label {
+  margin-bottom: 0.5rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+}
+
+.register-page .glass-input-field {
+  min-height: 1.6rem;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Same reset casualty: the submit button lost its padding and collapsed to
+   20px tall. Give it a real tap target and room around the label. */
+.register-page .submit-btn {
+  min-height: 3.25rem;
+  padding: 0.9rem 1.5rem;
+  margin-top: 0.5rem;
+  border-radius: 14px;
+}
+
+.register-page .submit-btn .btn-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* The success panel is inside the same reset, so it needs its spacing back. */
+.register-page .success-glass-card {
+  padding: 2.25rem 1.75rem;
+  text-align: center;
+}
+
+.register-page .success-title { margin: 1rem 0 0.6rem; }
+.register-page .success-desc { margin: 0 0 1.5rem; line-height: 1.7; }
+.register-page .success-btn { padding: 0.75rem 1.5rem; border-radius: 12px; }
 
 /* Two-up on tablet and wider; stacked on phones so nothing is cramped. */
 .register-row {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.15rem;
+  gap: 1.5rem;
 }
 
 @media (min-width: 640px) {
@@ -76,17 +130,17 @@
 }
 
 /* The select must match the glass text inputs it sits beside. */
-.register-select {
+.register-page .register-select {
   width: 100%;
-  padding-left: 16px;
+  padding-left: 0;
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
   /* room for the chevron */
-  padding-right: 2.5rem;
+  padding-right: 2rem;
   background-image: linear-gradient(45deg, transparent 50%, var(--accent-lavender) 50%),
                     linear-gradient(135deg, var(--accent-lavender) 50%, transparent 50%);
-  background-position: calc(100% - 20px) center, calc(100% - 14px) center;
+  background-position: calc(100% - 14px) center, calc(100% - 8px) center;
   background-size: 6px 6px, 6px 6px;
   background-repeat: no-repeat;
 }
@@ -102,7 +156,7 @@
 }
 
 .register-error {
-  margin: 0.45rem 0 0;
+  margin: 0.55rem 0 0;
   padding-left: 4px;
   font-size: 0.78rem;
   line-height: 1.4;
@@ -121,7 +175,7 @@
 }
 
 .register-privacy {
-  margin: 0.25rem 0 0;
+  margin: 0.6rem 0 0;
   text-align: center;
   font-size: 0.75rem;
   line-height: 1.5;
